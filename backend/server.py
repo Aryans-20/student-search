@@ -53,13 +53,19 @@ def get_all_students():
 def get_particular_student():
     username = request.args.get('username')
     roll = request.args.get('roll')
+    username1=username.split()
+    query="SELECT * FROM students WHERE username IS ?"
+    for i in range(len(username1)):
+        if(i!=0):
+            query=query +" INTERSECT SELECT * FROM students WHERE username IS ?"
+        username1[i]="%"+username1[i]+"%"
     if((username is None or username is '') and (roll is None or roll is '')):
         abort(400)
     db = get_db()
     c = db.cursor()
     if username:
         print(username)
-        c.execute("SELECT * FROM students WHERE username IS ?", (username, ))
+        c.execute(query, tuple(username1))
     else:
         print(roll)
         c.execute("SELECT * FROM students WHERE roll IS ?", (roll, ))
